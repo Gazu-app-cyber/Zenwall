@@ -13,6 +13,8 @@ function mapOpenverseResult(item, category) {
     author: item.creator || item.provider || "Fonte aberta",
     category,
     source: item.source || item.provider || "Openverse",
+    url: item.url,
+    thumb: item.thumbnail || item.url,
     imageUrl: item.url,
     thumbnailUrl: item.thumbnail || item.url,
     width: item.width,
@@ -127,6 +129,7 @@ export function useDynamicWallpapers(initialCategory = "all") {
   }, [fetchPage, wallpapers.length]);
 
   return useMemo(() => ({
+    extra: wallpapers.filter((item) => !fallbackWallpapers.some((fallback) => fallback.id === item.id)),
     wallpapers,
     loading,
     loadingMore,

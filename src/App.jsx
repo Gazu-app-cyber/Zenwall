@@ -1,52 +1,81 @@
+import { Toaster } from "@/components/ui/toaster";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Toaster } from "sonner";
-import BottomNav from "@/components/BottomNav";
-import UserNotRegisteredError from "@/components/UserNotRegisteredError";
-import { AuthProvider, useAuth } from "@/lib/AuthContext";
-import PageNotFound from "@/lib/PageNotFound";
 import { queryClientInstance } from "@/lib/query-client";
-import Home from "@/pages/home";
-import Premium from "@/pages/premium";
-import Profile from "@/pages/profile-modern";
+import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import PageNotFound from "@/lib/PageNotFound";
+import BottomNav from "@/components/BottomNav";
+import { AuthProvider, useAuth } from "@/lib/AuthContext";
+import UserNotRegisteredError from "@/components/UserNotRegisteredError";
+import Home from "@/pages/home-original";
+import Profile from "@/pages/profile";
+import Premium from "@/pages/premium-original";
 
-function AuthenticatedApp() {
-  const { isLoadingAuth, authError } = useAuth();
+const AnimatedRoutes = () => {
+  const location = useLocation();
 
-  if (isLoadingAuth) {
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        initial={{ x: 30, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: -30, opacity: 0 }}
+        transition={{ duration: 0.2, ease: "easeInOut" }}
+        style={{ minHeight: "100vh" }}
+      >
+        <Routes location={location}>
+          <Route path="/" element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/premium" element={<Premium />} />
+          <Route path="*" element={<PageNotFound />} />
+        </Routes>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+const AuthenticatedApp = () => {
+  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+
+  if (isLoadingPublicSettings || isLoadingAuth) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-background">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
+      <div className="fixed inset-0 flex items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" />
       </div>
     );
   }
 
-  if (authError?.type === "user_not_registered") {
-    return <UserNotRegisteredError />;
+  if (authError) {
+    if (authError.type === "user_not_registered") {
+      return <UserNotRegisteredError />;
+    }
+
+    if (authError.type === "auth_required") {
+      navigateToLogin();
+      return null;
+    }
   }
 
   return (
-    <div className="app-shell min-h-screen bg-background text-foreground">
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/premium" element={<Premium />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="*" element={<PageNotFound />} />
-      </Routes>
+    <>
+      <AnimatedRoutes />
       <BottomNav />
-    </div>
+    </>
   );
-}
+};
 
-export default function App() {
+function App() {
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
-        <BrowserRouter>
+        <Router>
           <AuthenticatedApp />
-        </BrowserRouter>
-        <Toaster position="top-center" richColors />
+        </Router>
+        <Toaster />
       </QueryClientProvider>
     </AuthProvider>
   );
 }
+
+export default App;
