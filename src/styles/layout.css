@@ -1,0 +1,150 @@
+.app-shell {
+  min-height: 100vh;
+}
+
+.topbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 40;
+  backdrop-filter: blur(18px);
+  background: rgba(9, 9, 13, 0.86);
+  border-bottom: 1px solid var(--line);
+  padding-top: env(safe-area-inset-top);
+}
+
+.topbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 72px;
+}
+
+.topbar__spacer {
+  flex: 1;
+}
+
+.topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand__badge {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: rgba(124, 58, 237, 0.18);
+  color: var(--primary-strong);
+  font-weight: 700;
+}
+
+.brand__name {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.brand__name span {
+  color: var(--primary-strong);
+}
+
+.searchbar {
+  position: relative;
+  flex: 1;
+  max-width: 420px;
+}
+
+.searchbar input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  padding: 14px 16px 14px 42px;
+  outline: none;
+}
+
+.searchbar__icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+}
+
+.bottom-nav {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 35;
+  display: none;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, rgba(9, 9, 13, 0.96), rgba(9, 9, 13, 0.55));
+}
+
+.bottom-nav__inner {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: min(440px, 100%);
+  margin: 0 auto;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: rgba(20, 20, 27, 0.95);
+}
+
+.bottom-nav__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border-radius: 16px;
+  color: var(--muted);
+}
+
+.bottom-nav__link--active {
+  background: rgba(124, 58, 237, 0.16);
+  color: #fff;
+}
+
+.footer {
+  padding: 24px 0 40px;
+}
+
+.footer__inner {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  padding-top: 18px;
+}
+
+@media (max-width: 768px) {
+  .bottom-nav {
+    display: block;
+  }
+
+  .topbar__actions .text-link--gold {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .brand__name {
+    display: none;
+  }
+}

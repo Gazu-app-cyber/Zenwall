@@ -1,78 +1,43 @@
 import { useMemo, useState } from "react";
-import { getTodayBrasilia } from "@/lib/brasilia";
-
-const STORAGE_KEY = "zenwall_usage";
-
-function readUsage() {
-  if (typeof window === "undefined") return {};
-  try {
-    return JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "{}");
-  } catch {
-    return {};
-  }
-}
-
-function writeUsage(value) {
-  if (typeof window !== "undefined") {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
-  }
-}
-
-function getFreshState(user) {
-  const date = getTodayBrasilia();
-  if (!user) return { savesCount: 0, adCredits: 0, date };
-  const usage = readUsage();
-  const current = usage[user.email];
-  if (!current || current.date !== date) {
-    const next = { savesCount: 0, adCredits: 0, date };
-    usage[user.email] = next;
-    writeUsage(usage);
-    return next;
-  }
-  return current;
-}
-
-function setFreshState(user, state) {
-  if (!user) return state;
-  const usage = readUsage();
-  usage[user.email] = state;
-  writeUsage(usage);
-  return state;
-}
+import {
+  getUsageState,
+  grantUsageAdCredit,
+  registerUsageSave,
+} from "@/services/storage/usageStorage";
 
 export function useUserUsage(user) {
   const [tick, setTick] = useState(0);
-  const state = useMemo(() => {
+
+  const usage = useMemo(() => {
     void tick;
-    return getFreshState(user);
+    return getUsageState(user);
   }, [tick, user]);
 
   const refresh = () => setTick((value) => value + 1);
-  const isPremium = () => Boolean(user?.is_premium);
-  const getSavesCount = () => state.savesCount || 0;
-  const canSave = () => isPremium() || state.savesCount < 3 || state.adCredits > 0;
-  const needsAd = () => !isPremium() && state.savesCount >= 3 && state.adCredits <= 0;
+  const isPremium = () => Boolean(user?.isPremium);
+  const getSavesCount = () => usage.savesCount;
+  const canSave = () => isPremium() || usage.savesCount < 3 || usage.adCredits > 0;
+  const needsAd = () => !isPremium() && usage.savesCount >= 3 && usage.adCredits <= 0;
 
   const consumeSave = () => {
-    if (isPremium()) return true;
-    const nextState = { ...getFreshState(user) };
-    if (nextState.savesCount >= 3 && nextState.adCredits > 0) {
-      nextState.adCredits -= 1;
-    } else if (nextState.savesCount >= 3) {
-      return false;
-    }
-    nextState.savesCount += 1;
-    setFreshState(user, nextState);
+    const result = registerUsageSave(user);
     refresh();
-    return true;
+    return result;
   };
 
   const grantAdReward = () => {
-    const nextState = { ...getFreshState(user) };
-    nextState.adCredits += 1;
-    setFreshState(user, nextState);
+    grantUsageAdCredit(user);
     refresh();
   };
 
-  return { isPremium, getSavesCount, canSave, needsAd, consumeSave, grantAdReward, refresh };
+  return {
+    usage,
+    refresh,
+    isPremium,
+    getSavesCount,
+    canSave,
+    needsAd,
+    consumeSave,
+    grantAdReward,
+  };
 }

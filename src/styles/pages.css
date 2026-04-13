@@ -1,0 +1,243 @@
+.premium-hero {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.pricing-card,
+.profile-card,
+.usage-card,
+.folders-panel,
+.saved-panel {
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow);
+}
+
+.pricing-card {
+  padding: 28px;
+}
+
+.pricing-card__price {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.pricing-card__price strong {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 64px;
+  line-height: 1;
+}
+
+.pricing-card__price span {
+  color: var(--muted);
+}
+
+.feature-list {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  margin: 0 0 24px;
+  list-style: none;
+}
+
+.feature-list li {
+  position: relative;
+  padding-left: 22px;
+}
+
+.feature-list li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--primary-strong);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 20px;
+  color: var(--muted);
+}
+
+.profile-page {
+  display: grid;
+  gap: 24px;
+}
+
+.profile-page__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.profile-page__header-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+}
+
+.profile-card h1 {
+  margin: 0 0 4px;
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.profile-card__avatar {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 24px;
+  background: rgba(124, 58, 237, 0.14);
+  color: var(--primary-strong);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.profile-card__premium {
+  margin-left: auto;
+}
+
+.premium-badge {
+  margin-left: auto;
+  color: var(--gold);
+}
+
+.usage-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+}
+
+.usage-card__meter {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+}
+
+.folders-panel,
+.saved-panel {
+  padding: 20px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+}
+
+.folder-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  text-align: left;
+  cursor: pointer;
+}
+
+.folder-item strong {
+  margin-left: auto;
+}
+
+.folder-item--active {
+  background: rgba(124, 58, 237, 0.16);
+  color: #fff;
+}
+
+.folder-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.folder-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.saved-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.saved-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  min-height: 240px;
+  background: var(--bg-soft);
+}
+
+.saved-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 3 / 4;
+}
+
+.saved-card__overlay {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0));
+}
+
+@media (max-width: 1024px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .saved-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .profile-page__header,
+  .profile-card,
+  .usage-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .profile-card__premium,
+  .premium-badge {
+    margin-left: 0;
+  }
+}

@@ -1,45 +1,52 @@
-import { RefreshCw } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-export default function PullToRefresh({ children, onRefresh }) {
+export default function PullToRefresh({ onRefresh, children }) {
   const startY = useRef(0);
-  const pulling = useRef(false);
-  const [distance, setDistance] = useState(0);
+  const [pullDistance, setPullDistance] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
-  const threshold = 70;
 
-  const onTouchStart = (event) => {
-    if (window.scrollY > 0 || refreshing) return;
-    startY.current = event.touches[0].clientY;
-    pulling.current = true;
-  };
+  useEffect(() => {
+    const handleTouchStart = (event) => {
+      if (window.scrollY === 0) {
+        startY.current = event.touches[0].clientY;
+      }
+    };
 
-  const onTouchMove = (event) => {
-    if (!pulling.current) return;
-    const nextDistance = Math.max(0, event.touches[0].clientY - startY.current);
-    setDistance(Math.min(nextDistance, 110));
-  };
+    const handleTouchMove = (event) => {
+      if (!startY.current || window.scrollY > 0 || refreshing) return;
+      const currentDistance = event.touches[0].clientY - startY.current;
+      if (currentDistance > 0) {
+        setPullDistance(Math.min(currentDistance, 120));
+      }
+    };
 
-  const onTouchEnd = async () => {
-    if (!pulling.current) return;
-    pulling.current = false;
-    if (distance >= threshold) {
-      setRefreshing(true);
-      await onRefresh();
-      setRefreshing(false);
-    }
-    setDistance(0);
-  };
+    const handleTouchEnd = async () => {
+      if (pullDistance >= 70 && !refreshing) {
+        setRefreshing(true);
+        await onRefresh();
+        setRefreshing(false);
+      }
+      setPullDistance(0);
+      startY.current = 0;
+    };
+
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+
+    return () => {
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [onRefresh, pullDistance, refreshing]);
 
   return (
-    <section onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
-      <div className="flex items-center justify-center overflow-hidden transition-all" style={{ height: distance ? Math.max(distance * 0.7, 20) : refreshing ? 52 : 0 }}>
-        <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/70 px-4 py-2 text-xs text-muted-foreground">
-          <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
-          {refreshing ? "Atualizando wallpapers" : distance >= threshold ? "Solte para atualizar" : "Puxe para atualizar"}
-        </div>
+    <>
+      <div className="pull-indicator" style={{ opacity: pullDistance ? 1 : 0 }}>
+        {refreshing ? "Atualizando..." : pullDistance >= 70 ? "Solte para atualizar" : "Puxe para atualizar"}
       </div>
-      {children}
-    </section>
+      <div style={{ transform: `translateY(${Math.min(pullDistance, 54)}px)` }}>{children}</div>
+    </>
   );
 }

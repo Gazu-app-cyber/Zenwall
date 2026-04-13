@@ -1,141 +1,90 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { fallbackWallpapers, queryByCategory } from "@/lib/wallpapers";
+import { fallbackWallpapers } from "@/data/wallpapers";
+import { fetchWallpapersPage } from "@/services/api/wallpapersApi";
 
-const OPENVERSE_ENDPOINTS = [
-  "https://api.openverse.engineering/v1/images/",
-  "https://api.openverse.org/v1/images/",
-];
-
-function mapOpenverseResult(item, category) {
-  return {
-    id: item.id,
-    title: item.title || "Wallpaper aberto",
-    author: item.creator || item.provider || "Fonte aberta",
-    category,
-    source: item.source || item.provider || "Openverse",
-    url: item.url,
-    thumb: item.thumbnail || item.url,
-    imageUrl: item.url,
-    thumbnailUrl: item.thumbnail || item.url,
-    width: item.width,
-    height: item.height,
-    orientation: item.height >= item.width ? "portrait" : "landscape",
-    license: item.license?.toUpperCase() || "CC",
-    licenseUrl: item.license_url,
-    attribution: item.attribution,
-    pageUrl: item.foreign_landing_url,
-  };
-}
-
-async function fetchOpenversePage({ category, page, signal }) {
-  const params = new URLSearchParams({
-    q: queryByCategory[category] || queryByCategory.all,
-    page: String(page),
-    page_size: "24",
-    license: "cc0,pdm",
-    category: "photograph",
-    aspect_ratio: "tall",
-    mature: "false",
-  });
-
-  let lastError;
-  for (const endpoint of OPENVERSE_ENDPOINTS) {
-    try {
-      const response = await fetch(`${endpoint}?${params.toString()}`, { signal });
-      if (!response.ok) throw new Error(`HTTP_${response.status}`);
-      const data = await response.json();
-      return (data.results || [])
-        .filter((item) => item.url && item.height && item.width)
-        .map((item) => mapOpenverseResult(item, category === "all" ? "featured" : category));
-    } catch (error) {
-      lastError = error;
-    }
-  }
-  throw lastError || new Error("OPENVERSE_UNAVAILABLE");
-}
-
-export function useDynamicWallpapers(initialCategory = "all") {
+export function useDynamicWallpapers(category = "all") {
   const [wallpapers, setWallpapers] = useState(fallbackWallpapers);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [error, setError] = useState(null);
-  const [sourceLabel, setSourceLabel] = useState("Colecao aberta em tempo real");
-  const pagesRef = useRef({ [initialCategory]: 0 });
-  const seenIdsRef = useRef(new Set(fallbackWallpapers.map((item) => item.id)));
-  const abortRef = useRef(null);
+  const [error, setError] = useState("");
+  const pageRef = useRef({});
+  const seenRef = useRef(new Set(fallbackWallpapers.map((item) => item.id)));
 
-  const mergeWallpapers = useCallback((incoming) => {
-    const unique = incoming.filter((item) => {
-      if (seenIdsRef.current.has(item.id)) return false;
-      seenIdsRef.current.add(item.id);
-      return true;
+  const appendUnique = useCallback((items, reset = false) => {
+    if (reset) {
+      seenRef.current = new Set(fallbackWallpapers.map((item) => item.id));
+      setWallpapers(fallbackWallpapers);
+    }
+
+    const nextItems = [];
+    items.forEach((item) => {
+      if (!seenRef.current.has(item.id)) {
+        seenRef.current.add(item.id);
+        nextItems.push(item);
+      }
     });
-    if (unique.length) {
-      setWallpapers((current) => [...current, ...unique]);
+
+    if (nextItems.length) {
+      setWallpapers((current) => (reset ? [...fallbackWallpapers, ...nextItems] : [...current, ...nextItems]));
     }
   }, []);
 
-  const fetchPage = useCallback(async (category, reset = false) => {
-    abortRef.current?.abort();
-    abortRef.current = new AbortController();
-    const nextPage = reset ? 1 : (pagesRef.current[category] || 0) + 1;
-    const setLoadingState = reset ? setLoading : setLoadingMore;
-    setLoadingState(true);
-    setError(null);
+  const loadPage = useCallback(
+    async (nextCategory, reset = false) => {
+      const nextPage = reset ? 1 : (pageRef.current[nextCategory] || 0) + 1;
+      const setPending = reset ? setLoading : setLoadingMore;
+      setPending(true);
+      setError("");
 
-    try {
-      const nextItems = await fetchOpenversePage({
-        category,
-        page: nextPage,
-        signal: abortRef.current.signal,
-      });
-      if (reset) {
-        seenIdsRef.current = new Set(fallbackWallpapers.map((item) => item.id));
-        setWallpapers(fallbackWallpapers);
+      try {
+        const items = await fetchWallpapersPage(nextCategory, nextPage);
+        appendUnique(items, reset);
+        pageRef.current[nextCategory] = nextPage;
+      } catch (requestError) {
+        setError(requestError.message || "Nao foi possivel carregar mais wallpapers.");
+        if (reset) {
+          setWallpapers(fallbackWallpapers);
+        }
+      } finally {
+        setPending(false);
       }
-      mergeWallpapers(nextItems);
-      pagesRef.current[category] = nextPage;
-      setSourceLabel("Openverse com licencas abertas");
-    } catch (fetchError) {
-      if (fetchError.name !== "AbortError") {
-        setError(fetchError);
-        setSourceLabel("Colecao local com fallback aberto");
-      }
-    } finally {
-      setLoadingState(false);
-    }
-  }, [mergeWallpapers]);
+    },
+    [appendUnique]
+  );
 
   useEffect(() => {
-    fetchPage(initialCategory, true);
-    return () => abortRef.current?.abort();
-  }, [fetchPage, initialCategory]);
-
-  const fetchMore = useCallback(async (category) => {
-    if (!loadingMore) await fetchPage(category, false);
-  }, [fetchPage, loadingMore]);
-
-  const refresh = useCallback(async (category) => {
-    await fetchPage(category, true);
-  }, [fetchPage]);
+    loadPage(category, true);
+  }, [category, loadPage]);
 
   useEffect(() => {
-    const interval = window.setInterval(() => {
+    const intervalId = window.setInterval(() => {
       if (wallpapers.length < 120) {
-        fetchPage("all", false);
+        void loadPage(category, false);
       }
     }, 30000);
-    return () => window.clearInterval(interval);
-  }, [fetchPage, wallpapers.length]);
 
-  return useMemo(() => ({
-    extra: wallpapers.filter((item) => !fallbackWallpapers.some((fallback) => fallback.id === item.id)),
-    wallpapers,
-    loading,
-    loadingMore,
-    error,
-    sourceLabel,
-    fetchMore,
-    refresh,
-  }), [error, fetchMore, loading, loadingMore, refresh, sourceLabel, wallpapers]);
+    return () => window.clearInterval(intervalId);
+  }, [category, loadPage, wallpapers.length]);
+
+  const fetchMore = useCallback(async () => {
+    if (!loadingMore) {
+      await loadPage(category, false);
+    }
+  }, [category, loadPage, loadingMore]);
+
+  const refresh = useCallback(async () => {
+    await loadPage(category, true);
+  }, [category, loadPage]);
+
+  return useMemo(
+    () => ({
+      wallpapers,
+      loading,
+      loadingMore,
+      error,
+      fetchMore,
+      refresh,
+    }),
+    [error, fetchMore, loading, loadingMore, refresh, wallpapers]
+  );
 }
