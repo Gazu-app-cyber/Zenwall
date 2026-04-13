@@ -87,7 +87,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background pb-28 md:pb-0">
       <Navbar searchQuery={searchQuery} onSearchChange={setSearchQuery} onAuthClick={openAuthModal} />
-      <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 pb-10 sm:px-6">
+      <main className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 pb-16 sm:px-6">
         <HeroSection totalCount={wallpapers.length} sourceLabel={sourceLabel} />
         <CategoryFilter categories={categories} activeCategory={activeCategory} onSelect={setActiveCategory} />
         <PullToRefresh onRefresh={handleRefresh}>

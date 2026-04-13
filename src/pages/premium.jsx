@@ -1,4 +1,4 @@
-import { Check, Crown, ShieldCheck, Sparkles } from "lucide-react";
+import { Check, Crown, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
@@ -34,66 +34,59 @@ export default function Premium() {
 
   return (
     <div className="min-h-screen bg-background pb-28 md:pb-0">
-      <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 sm:px-6 sm:py-10">
-        <Link to="/" className="inline-flex w-fit items-center gap-2 rounded-full border border-border/60 bg-card/70 px-4 py-2 text-sm text-muted-foreground transition hover:text-foreground">
-          Voltar para Home
+      <main className="mx-auto flex w-full max-w-3xl flex-col px-4 py-10 sm:px-6 sm:py-14">
+        <Link to="/" className="inline-flex w-fit items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground">
+          <ArrowLeft className="h-4 w-4" />
+          Voltar
         </Link>
 
-        <section className="grid gap-6 lg:grid-cols-[1.15fr,0.85fr]">
-          <div className="rounded-[2.25rem] border border-primary/20 bg-gradient-to-br from-primary/20 via-card to-card p-6 sm:p-8">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-yellow-500/20 bg-yellow-500/10 px-4 py-2 text-sm text-yellow-400">
-              <Crown className="h-4 w-4" />
-              ZenWall Premium
-            </div>
-            <h1 className="max-w-xl font-heading text-4xl font-bold leading-tight sm:text-5xl">
-              Todos os wallpapers sem limite, sem anuncios e por R$ 20 por mes.
-            </h1>
-            <p className="mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg">
-              O plano premium libera salvamentos ilimitados, acesso continuo a novas artes abertas e uma experiencia mobile limpa.
-            </p>
-
-            <div className="mt-8 grid gap-3">
-              {FEATURES.map((feature) => (
-                <div key={feature} className="flex items-center gap-3 rounded-2xl border border-border/40 bg-background/40 px-4 py-3">
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary/15 text-primary">
-                    <Check className="h-4 w-4" />
-                  </span>
-                  <span className="text-sm sm:text-base">{feature}</span>
-                </div>
-              ))}
-            </div>
+        <section className="mt-10 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-yellow-500/25 bg-yellow-500/10 px-5 py-2 text-sm text-yellow-400">
+            <Crown className="h-4 w-4" />
+            Plano Premium
           </div>
 
-          <div className="rounded-[2.25rem] border border-border/60 bg-card/80 p-6 sm:p-8">
-            <div className="mb-6 flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/15 text-primary">
-                <Sparkles className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="font-heading text-xl font-bold">Plano mensal</p>
-                <p className="text-sm text-muted-foreground">Sem limite diario de saves</p>
-              </div>
-            </div>
+          <h1 className="mt-7 font-heading text-5xl font-bold tracking-[-0.04em] text-white sm:text-6xl">
+            Acesso
+            <span className="ml-3 bg-gradient-to-r from-primary via-violet-400 to-fuchsia-500 bg-clip-text text-transparent">
+              ilimitado
+            </span>
+          </h1>
 
-            <div className="mb-6 flex items-end gap-2">
-              <span className="font-heading text-5xl font-bold">R$ 20</span>
-              <span className="pb-1 text-sm text-muted-foreground">por mes</span>
-            </div>
-
-            <button onClick={handleSubscribe} className="mb-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-3.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90">
-              <Crown className="h-4 w-4" />
-              {user?.is_premium ? "Premium ativo" : "Ativar Premium"}
-            </button>
-
-            <div className="rounded-2xl border border-border/50 bg-background/50 p-4 text-sm text-muted-foreground">
-              <div className="mb-2 flex items-center gap-2 text-foreground">
-                <ShieldCheck className="h-4 w-4 text-primary" />
-                Implementacao atual
-              </div>
-              O fluxo de pagamento foi deixado em modo local para demonstracao. Em producao, basta substituir essa acao pela confirmacao real do gateway.
-            </div>
-          </div>
+          <p className="mt-5 text-xl text-muted-foreground">
+            Salve quantos wallpapers quiser, sem anuncios, sem limites.
+          </p>
         </section>
+
+        <section className="mt-12 rounded-[2rem] border border-white/8 bg-card/80 p-8 shadow-[0_30px_80px_rgba(0,0,0,0.35)] sm:p-10">
+          <div className="mb-10 flex items-end gap-2">
+            <span className="font-heading text-6xl font-bold tracking-[-0.05em] text-white">R$ 20</span>
+            <span className="pb-2 text-2xl text-muted-foreground">/mês</span>
+          </div>
+
+          <div className="space-y-5">
+            {FEATURES.map((feature) => (
+              <div key={feature} className="flex items-center gap-4 text-lg text-white">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary/15 text-primary">
+                  <Check className="h-4 w-4" />
+                </span>
+                {feature}
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={handleSubscribe}
+            className="mt-10 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary to-violet-500 px-4 py-4 text-lg font-semibold text-primary-foreground shadow-[0_20px_45px_rgba(124,58,237,0.35)] transition hover:opacity-95"
+          >
+            <Crown className="h-5 w-5" />
+            {user?.is_premium ? "Premium ativo" : "Assinar agora"}
+          </button>
+        </section>
+
+        <p className="mx-auto mt-8 max-w-2xl text-center text-sm text-muted-foreground">
+          Plano gratuito: 3 saves/dia com anuncios. Reset todo dia à meia-noite (horário de Brasília).
+        </p>
       </main>
     </div>
   );

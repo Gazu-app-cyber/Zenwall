@@ -8,7 +8,7 @@ import PageNotFound from "@/lib/PageNotFound";
 import { queryClientInstance } from "@/lib/query-client";
 import Home from "@/pages/home";
 import Premium from "@/pages/premium";
-import Profile from "@/pages/profile";
+import Profile from "@/pages/profile-modern";
 
 function AuthenticatedApp() {
   const { isLoadingAuth, authError } = useAuth();

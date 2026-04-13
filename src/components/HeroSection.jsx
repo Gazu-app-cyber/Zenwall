@@ -1,35 +1,35 @@
-import { Sparkles, Smartphone, Wand2 } from "lucide-react";
+import { Download, Sparkles } from "lucide-react";
 
 export default function HeroSection({ totalCount, sourceLabel }) {
   return (
-    <section className="overflow-hidden rounded-[2.5rem] border border-primary/20 bg-[radial-gradient(circle_at_top_left,_rgba(139,92,246,0.3),_transparent_35%),linear-gradient(135deg,rgba(17,24,39,0.95),rgba(15,23,42,0.85))] p-6 sm:p-8">
-      <div className="max-w-3xl">
-        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-xs uppercase tracking-[0.2em] text-primary">
+    <section className="relative overflow-hidden rounded-[2.8rem] border border-white/5 bg-[radial-gradient(circle_at_28%_35%,rgba(76,29,149,0.32),transparent_22%),radial-gradient(circle_at_65%_25%,rgba(91,33,182,0.24),transparent_18%),linear-gradient(180deg,rgba(9,9,11,0.98),rgba(9,9,11,0.94))] px-6 py-14 text-center sm:px-10 sm:py-20">
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.02),transparent)] opacity-40" />
+      <div className="relative mx-auto max-w-3xl">
+        <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-xs font-medium text-primary">
           <Sparkles className="h-4 w-4" />
-          Wallpapers abertos
+          100% Gratuito • Sem direitos autorais
         </div>
-        <h1 className="font-heading text-4xl font-bold leading-tight sm:text-5xl">
-          Wallpapers prontos para baixar no celular, com feed infinito e experiencia mobile de verdade.
+
+        <h1 className="font-heading text-5xl font-bold leading-[0.95] tracking-[-0.04em] text-white sm:text-7xl">
+          Wallpapers
+          <span className="mt-2 block bg-gradient-to-r from-primary via-violet-400 to-fuchsia-500 bg-clip-text text-transparent">
+            Incriveis
+          </span>
         </h1>
-        <p className="mt-4 max-w-2xl text-sm text-slate-300 sm:text-base">
-          O app carrega novas imagens em segundo plano, permite salvar favoritos em pastas e libera uso ilimitado com premium.
+
+        <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate-400">
+          Descubra {Math.max(totalCount, 54)}+ wallpapers de alta qualidade para desktop e mobile. Baixe gratis.
         </p>
-        <div className="mt-6 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-[1.75rem] border border-white/10 bg-white/5 p-4">
-            <Smartphone className="mb-3 h-5 w-5 text-primary" />
-            <p className="text-xs uppercase tracking-[0.15em] text-slate-400">Mobile first</p>
-            <strong className="mt-1 block text-xl">{totalCount}+</strong>
-          </div>
-          <div className="rounded-[1.75rem] border border-white/10 bg-white/5 p-4">
-            <Wand2 className="mb-3 h-5 w-5 text-primary" />
-            <p className="text-xs uppercase tracking-[0.15em] text-slate-400">Fonte ativa</p>
-            <strong className="mt-1 block text-sm">{sourceLabel}</strong>
-          </div>
-          <div className="rounded-[1.75rem] border border-white/10 bg-white/5 p-4">
-            <Sparkles className="mb-3 h-5 w-5 text-primary" />
-            <p className="text-xs uppercase tracking-[0.15em] text-slate-400">Plano free</p>
-            <strong className="mt-1 block text-sm">3 saves por dia + anuncios</strong>
-          </div>
+
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-4 text-sm text-slate-500">
+          <span className="inline-flex items-center gap-2">
+            <Download className="h-4 w-4" />
+            Download instantaneo
+          </span>
+          <span className="hidden h-1 w-1 rounded-full bg-slate-600 sm:block" />
+          <span>HD & 4K</span>
+          <span className="hidden h-1 w-1 rounded-full bg-slate-600 sm:block" />
+          <span className="max-w-[220px] truncate">{sourceLabel}</span>
         </div>
       </div>
     </section>
